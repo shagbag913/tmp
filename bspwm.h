@@ -1,6 +1,6 @@
 #include <iostream>
 #include <thread>
 
-namespace battery {
+namespace bspwm {
     std::thread start();
 }
