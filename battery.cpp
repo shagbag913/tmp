@@ -5,55 +5,51 @@
 #include <string>
 namespace fs = std::filesystem;
 
-std::string statusString;
+namespace battery {
 
-std::string getBatterySysfsDir() {
-    std::string path = "/sys/class/power_supply/";
-    for (const auto &entry : fs::directory_iterator(path))
-        if (entry.path().string().find("BAT") != std::string::npos)
-            return entry.path();
-    return "";
-}
-
-int readCapacityFile() {
-    std::ifstream capacityFile;
-    std::string capacity;
-
-    capacityFile.open(getBatterySysfsDir() + "/capacity");
-    if (!capacityFile.is_open()) {
-        /* Return -1 in case file couldn't be opened */
-        return -1;
+    std::string getBatterySysfsDir() {
+        std::string path = "/sys/class/power_supply/";
+        for (const auto &entry : fs::directory_iterator(path))
+            if (entry.path().string().find("BAT") != std::string::npos)
+                return entry.path();
+        return "";
     }
-    std::getline(capacityFile, capacity);
 
-    return std::stoi(capacity);
-}
+    int readCapacityFile() {
+        std::ifstream capacityFile;
+        std::string capacity;
 
-bool isCharging() {
-    std::ifstream statusFile;
-    std::string status;
+        capacityFile.open(getBatterySysfsDir() + "/capacity");
+        if (!capacityFile.is_open()) {
+            /* Return -1 in case file couldn't be opened */
+            return -1;
+        }
+        std::getline(capacityFile, capacity);
 
-    statusFile.open(getBatterySysfsDir() + "/status");
-    if (!statusFile.is_open()) {
-        return false;
+        return std::stoi(capacity);
     }
-    std::getline(statusFile, status);
 
-    return status == "Charging";
-}
+    bool isCharging() {
+        std::ifstream statusFile;
+        std::string status;
 
-void startLoop() {
-    std::string newStatusString;
+        statusFile.open(getBatterySysfsDir() + "/status");
+        if (!statusFile.is_open()) {
+            return false;
+        }
+        std::getline(statusFile, status);
 
-    while (true) {
-        newStatusString = "  " + std::to_string(readCapacityFile()) + "%";
+        return status == "Charging";
+    }
+
+    std::string updateStatusFunction() {
+        std::string statusString;
+
+        statusString = "  " + std::to_string(readCapacityFile()) + "%";
         if (isCharging()) {
-            newStatusString += "";
+            statusString += "";
         }
 
-        if (statusString != newStatusString) {
-            statusString = newStatusString;
-            std::cout << statusString << std::endl;
-        }
+        return statusString;
     }
 }

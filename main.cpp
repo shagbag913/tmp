@@ -1,7 +1,19 @@
+#include <chrono>
 #include <iostream>
+#include <map>
+#include <thread>
 #include "module.h"
 #include "battery.h"
 
+std::map<std::string, std::string> moduleMap;
+
 int main() {
-    Module batteryModule = Module(2000, startLoop);
+    /* Start threads */
+    Module batteryModule = Module(2000, battery::updateStatusFunction, "battery");
+    batteryModule.startLoop();
+}
+
+void printBuffer(std::string statusString, std::string moduleName) {
+    moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));
+    std::cout << moduleMap.at(moduleName) << std::endl;
 }
