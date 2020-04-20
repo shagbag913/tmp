@@ -14,6 +14,9 @@ int main() {
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
-    moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));
+    if (!moduleMap.count(moduleName))
+        moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));
+    else
+        moduleMap.at(moduleName) = statusString;
     std::cout << moduleMap.at(moduleName) << std::endl;
 }
