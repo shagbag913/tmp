@@ -45,34 +45,51 @@ namespace battery {
         return status == "Charging";
     }
 
-    std::string getCurrentChargeGlyph(int currentCharge) {
+    int getCurrentChargeGlyphIndex(int currentCharge) {
+        if (currentCharge >= 90)
+            return 4;
+        else if (currentCharge >= 75)
+            return 3;
+        else if (currentCharge >= 50)
+            return 2;
+        else if (currentCharge >= 25)
+            return 1;
+        else
+            return 0;
+    }
+
+    std::string getBatteryGlyph(int index) {
         char const* glyphs[] = {"", "", "", "", ""};
 
-        if (currentCharge >= 90)
-            return glyphs[4];
-        else if (currentCharge >= 75)
-            return glyphs[3];
-        else if (currentCharge >= 50)
-            return glyphs[2];
-        else if (currentCharge >= 25)
-            return glyphs[1];
-        else
+        if (index < 0 || index > 4)
             return glyphs[0];
+
+        return glyphs[index];
     }
 
     void startLoop() {
         std::string statusString;
-        int previousCapacity, currentCapacity;
+        int previousCapacity, currentCapacity, glyphIndex;
         bool wasCharging, nowCharging;
 
         while (true) {
             currentCapacity = readCapacityFile();
             nowCharging = isCharging();
 
-            if (previousCapacity != currentCapacity || nowCharging != wasCharging) {
+            if (previousCapacity != currentCapacity || nowCharging != wasCharging || nowCharging) {
                 previousCapacity = currentCapacity;
                 wasCharging = nowCharging;
-                statusString = getCurrentChargeGlyph(currentCapacity) + " "
+
+                if (nowCharging) {
+                    if (glyphIndex < 4)
+                        glyphIndex++;
+                    else
+                        glyphIndex = getCurrentChargeGlyphIndex(currentCapacity);
+                } else
+                    glyphIndex = getCurrentChargeGlyphIndex(currentCapacity);
+
+
+                statusString = getBatteryGlyph(glyphIndex) + " "
                         + std::to_string(currentCapacity) + "%" + (nowCharging ? "+" : "");
                 printBuffer(statusString, "battery");
             }
