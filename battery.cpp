@@ -1,8 +1,11 @@
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <thread>
+#include "main.h"
 namespace fs = std::filesystem;
 
 namespace battery {
@@ -57,15 +60,29 @@ namespace battery {
             return glyphs[0];
     }
 
-    std::string updateStatusFunction() {
+    void startLoop() {
         std::string statusString;
-        int currentCapacity = readCapacityFile();
+        int previousCapacity, currentCapacity;
+        bool wasCharging, nowCharging;
 
-        statusString = getCurrentChargeGlyph(currentCapacity) + " " + std::to_string(currentCapacity) + "%";
-        if (isCharging()) {
-            statusString += "+";
+        while (true) {
+            currentCapacity = readCapacityFile();
+            nowCharging = isCharging();
+
+            if (previousCapacity != currentCapacity || nowCharging != wasCharging) {
+                previousCapacity = currentCapacity;
+                wasCharging = nowCharging;
+                statusString = getCurrentChargeGlyph(currentCapacity) + " "
+                        + std::to_string(currentCapacity) + "%" + (nowCharging ? "+" : "");
+                printBuffer(statusString, "battery");
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(2));
         }
+    }
 
-        return statusString;
+    void start() {
+        std::thread t(startLoop);
+        t.join();
     }
 }

@@ -1,5 +1,5 @@
 #include <iostream>
 
 namespace battery {
-    std::string updateStatusFunction();
+    void start();
 }

@@ -2,15 +2,13 @@
 #include <iostream>
 #include <map>
 #include <thread>
-#include "module.h"
 #include "battery.h"
 
 std::map<std::string, std::string> moduleMap;
 
 int main() {
     /* Start threads */
-    Module batteryModule = Module(2000, battery::updateStatusFunction, "battery");
-    batteryModule.startLoop();
+    battery::start();
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
