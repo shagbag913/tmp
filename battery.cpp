@@ -42,12 +42,28 @@ namespace battery {
         return status == "Charging";
     }
 
+    std::string getCurrentChargeGlyph(int currentCharge) {
+        char const* glyphs[] = {"", "", "", "", ""};
+
+        if (currentCharge >= 90)
+            return glyphs[4];
+        else if (currentCharge >= 75)
+            return glyphs[3];
+        else if (currentCharge >= 50)
+            return glyphs[2];
+        else if (currentCharge >= 25)
+            return glyphs[1];
+        else
+            return glyphs[0];
+    }
+
     std::string updateStatusFunction() {
         std::string statusString;
+        int currentCapacity = readCapacityFile();
 
-        statusString = "  " + std::to_string(readCapacityFile()) + "%";
+        statusString = getCurrentChargeGlyph(currentCapacity) + " " + std::to_string(currentCapacity) + "%";
         if (isCharging()) {
-            statusString += "";
+            statusString += "+";
         }
 
         return statusString;
