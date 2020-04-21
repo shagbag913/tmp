@@ -53,7 +53,7 @@ namespace bspwm {
         }
 
         /* Remove final seperator */
-        formattedStatus.resize(formattedStatus.size() - 2);
+        formattedStatus.resize(formattedStatus.size() - 3);
 
         printBuffer(formattedStatus, "bspwm");
     }
