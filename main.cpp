@@ -5,23 +5,26 @@
 #include "battery.h"
 #include "bspwm.h"
 #include "date.h"
+#include "net.h"
 
 std::map<std::string, std::string> moduleMap;
 
 /* Temp */
 std::string defaultLeftModules[] = {"bspwm"};
 std::string defaultCenterModules[] = {"time", "date"};
-std::string defaultRightModules[] = {"battery"};
+std::string defaultRightModules[] = {"net", "battery"};
 
 int main() {
     /* Start threads */
     std::thread t1 = bspwm::start();
     std::thread t2 = battery::start();
     std::thread t3 = date::start();
+    std::thread t4 = net::start();
 
     t1.join();
     t2.join();
     t3.join();
+    t4.join();
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
