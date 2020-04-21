@@ -69,8 +69,8 @@ namespace battery {
 
     void startLoop() {
         std::string statusString;
-        int previousCapacity, currentCapacity, glyphIndex;
-        bool wasCharging, nowCharging;
+        int previousCapacity = 0, currentCapacity = 0, glyphIndex = -1;
+        bool wasCharging = false, nowCharging = true;
 
         while (true) {
             currentCapacity = readCapacityFile();
@@ -80,7 +80,7 @@ namespace battery {
                 previousCapacity = currentCapacity;
                 wasCharging = nowCharging;
 
-                if (nowCharging) {
+                if (nowCharging && glyphIndex != -1) {
                     if (glyphIndex < 4)
                         glyphIndex++;
                     else
