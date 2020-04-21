@@ -22,6 +22,8 @@ namespace date {
             timeString += "12";
         else if (localTime->tm_hour > 12)
             timeString += std::to_string(localTime->tm_hour-12);
+        else
+            timeString += std::to_string(localTime->tm_hour);
 
         timeString += ":";
 
