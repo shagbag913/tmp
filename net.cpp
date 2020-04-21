@@ -30,7 +30,7 @@ namespace net {
             }
         }
 
-        formattedNetString.resize(formattedNetString.size() - 1);
+        formattedNetString.resize(formattedNetString.size() - 2);
         return formattedNetString;
     }
 
