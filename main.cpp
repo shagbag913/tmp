@@ -9,7 +9,9 @@
 std::map<std::string, std::string> moduleMap;
 
 /* Temp */
-std::string defaultModuleOrder[] = {"battery", "bspwm", "date", "time"};
+std::string defaultLeftModules[] = {"bspwm"};
+std::string defaultCenterModules[] = {"time", "date"};
+std::string defaultRightModules[] = {"battery"};
 
 int main() {
     /* Start threads */
@@ -23,18 +25,29 @@ int main() {
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
-    std::string finalPrintBuffer;
-
     if (!moduleMap.count(moduleName))
         moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));
     else
         moduleMap.at(moduleName) = statusString;
 
-    for (std::string module : defaultModuleOrder)
+    std::string finalPrintBuffer = "%{l}";
+    for (std::string module : defaultLeftModules)
+        finalPrintBuffer += moduleMap[module] + "  |  ";
+
+    finalPrintBuffer.resize(finalPrintBuffer.size() - 5);
+    finalPrintBuffer += "%{c}";
+
+    for (std::string module : defaultCenterModules)
+        finalPrintBuffer += moduleMap[module] + "  |  ";
+
+    finalPrintBuffer.resize(finalPrintBuffer.size() - 5);
+    finalPrintBuffer += "%{r}";
+
+    for (std::string module : defaultRightModules)
         finalPrintBuffer += moduleMap[module] + "  |  ";
 
     /* Remove final seperator */
-    finalPrintBuffer.resize(finalPrintBuffer.size() - 3);
+    finalPrintBuffer.resize(finalPrintBuffer.size() - 5);
 
     std::cout << finalPrintBuffer << std::endl;
 }
