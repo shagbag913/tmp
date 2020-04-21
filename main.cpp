@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <thread>
+#include "backlight.h"
 #include "battery.h"
 #include "bspwm.h"
 #include "date.h"
@@ -12,7 +13,7 @@ std::map<std::string, std::string> moduleMap;
 /* Temp */
 std::string defaultLeftModules[] = {"bspwm"};
 std::string defaultCenterModules[] = {"time", "date"};
-std::string defaultRightModules[] = {"net", "battery"};
+std::string defaultRightModules[] = {"backlight", "net", "battery"};
 
 int main() {
     /* Start threads */
@@ -20,11 +21,13 @@ int main() {
     std::thread t2 = battery::start();
     std::thread t3 = date::start();
     std::thread t4 = net::start();
+    std::thread t5 = backlight::start();
 
     t1.join();
     t2.join();
     t3.join();
     t4.join();
+    t5.join();
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
