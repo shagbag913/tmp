@@ -13,12 +13,8 @@
 namespace bspwm {
 
     int subscribeToEvents() {
-        std::string socketPath;
-        /* bspwm supports setting socket via BSPWM_SOCKET env var */
-        socketPath = std::getenv("BSPWM_SOCKET");
-        if (socketPath.empty())
-            socketPath = "/tmp/bspwm_0_0-socket";
-
+        std::string socketPath = "/tmp/bspwm_0_0-socket";
+        
         struct sockaddr_un addr;
         addr.sun_family = AF_UNIX;
         strcpy(addr.sun_path, socketPath.c_str());
