@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <thread>
 
 #include "modules/backlight.h"
@@ -10,6 +11,8 @@
 #include "modules/net.h"
 
 std::map<std::string, std::string> moduleMap;
+
+std::mutex printMutex;
 
 /* Temp */
 std::string defaultLeftModules[] = {"bspwm"};
@@ -32,6 +35,7 @@ int main() {
 }
 
 void printBuffer(std::string statusString, std::string moduleName) {
+    printMutex.lock();
     if (!moduleMap.count(moduleName))
         moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));
     else
@@ -57,4 +61,5 @@ void printBuffer(std::string statusString, std::string moduleName) {
     finalPrintBuffer.resize(finalPrintBuffer.size() - 5);
 
     std::cout << finalPrintBuffer << std::endl;
+    printMutex.unlock();
 }
