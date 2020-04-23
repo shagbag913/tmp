@@ -9,10 +9,13 @@ OUT = shagbar
 $(OUT): $(OBJ)
 	$(CXX) $(LDLIBS) $(OBJ) -o $@
 
+debug: CXXFLAGS += -g -O0
+debug: $(OUT)
+
 install: $(OUT)
 	cp $(OUT) $(DESTDIR)/usr/bin/
 
 clean:
 	rm -f $(OBJ) $(OUT)
 
-.PHONY: clean install
+.PHONY: clean install debug
