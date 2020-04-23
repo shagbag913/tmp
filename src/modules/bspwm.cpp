@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <linux/un.h>
+#include <map>
 #include <sstream>
 #include <string>
 #include <sys/socket.h>
@@ -13,14 +14,19 @@
 
 namespace bspwm {
 
-    int subscribeToEvents() {
+    /* Workspace index: workspace ID */
+    std::map<int, std::string> workspaceMap;
+
+    /* Workspace ID: workspace has nodes */
+    std::map<std::string, bool> nodeMap;
+
+    int openBspwmSocket() {
         /* bspwm supports setting socket via BSPWM_SOCKET env var */
         const char *socketPath = std::getenv("BSPWM_SOCKET");
         if (socketPath == nullptr)
             socketPath = "/tmp/bspwm_0_0-socket";
 
-        struct sockaddr_un addr;
-        addr.sun_family = AF_UNIX;
+        struct sockaddr_un addr = { AF_UNIX };
         strcpy(addr.sun_path, socketPath);
 
         int sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -28,43 +34,121 @@ namespace bspwm {
             return 0;
         if (connect(sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_un)) < 0)
             return 0;
-        if (send(sock, "subscribe", sizeof("subscribe"), 0) < 0)
-            return 0;
 
         return sock;
     }
 
-    void printBspwmBuffer(std::string wmStatus) {
-        std::istringstream socketStatus(wmStatus);
-        std::string ws, formattedStatus, wsIndxString;
-        int wsIndx = 0;
-        while (std::getline(socketStatus, ws, ':')) {
-            if (ws == "LT" || ws == "LM")
-                break;
-
-            wsIndxString = std::to_string(wsIndx);
-
-            if (ws[0] == 'O' || ws[0] == 'F')
-                formattedStatus += "%{+u}  " + wsIndxString + "  %{-u} | ";
-            else if (ws[0] == 'o')
-                formattedStatus += "%{A:bspc desktop -f ^" + wsIndxString + ":}  " + wsIndxString + "  %{A} | ";
-
-            wsIndx++;
+    bool writeToSocket(int sock, const char *msg) {
+        char *formattedMsg = new char[strlen(msg)+1];
+        for (int x = 0; x < (int)strlen(msg); x++) {
+            if (msg[x] == ' ')
+                std::sprintf(formattedMsg+x, "%c", 0);
+            else
+                std::sprintf(formattedMsg+x, "%c", msg[x]);
         }
+        bool writeSuccessful = send(sock, formattedMsg, strlen(msg)+1, 0) != -1;
+        delete[] formattedMsg;
+        return writeSuccessful;
+    }
 
-        /* Remove final seperator */
-        formattedStatus.resize(formattedStatus.size() - 3);
+    std::string readSocketOutput(int sock) {
+        std::string output(1024, 0);
+        int numRead = read(sock, &output[0], 1023);
+        output.resize(numRead-1);
+        return output;
+    }
 
-        printBuffer(formattedStatus, "bspwm");
+    void fillWorkspaceMap(int sock) {
+        writeToSocket(sock, "query --desktops");
+        std::istringstream workspaces(readSocketOutput(sock));
+        std::string buf;
+        int iter = 0;
+
+        while (std::getline(workspaces, buf, '\n')) {
+            workspaceMap.insert(std::pair<int, std::string>(iter, buf));
+            iter++;
+        }
+    }
+
+    std::string filterId(std::string strn) {
+        int space = strn.find_last_of(' ');
+        if (space > 0 && space < (int)strn.size()) {
+            strn = strn.substr(space+1, strn.size() - space);
+        }
+        return strn;
+    }
+
+    void subscribeToWMEvents(int sock) {
+        writeToSocket(sock, "subscribe desktop_focus node_add node_remove node_transfer");
+    }
+
+    bool doesDesktopHaveNodes(int *sock, std::string desktopId) {
+        char *queryMsg = new char[sizeof("query --nodes --desktop ") + desktopId.size() + 1];
+        sprintf(queryMsg, "query --nodes --desktop %s", desktopId.c_str());
+
+        close(*sock);
+        *sock = openBspwmSocket();
+
+        writeToSocket(*sock, queryMsg);
+
+        delete[] queryMsg;
+
+        std::string output = readSocketOutput(*sock);
+
+        /* Resubscribe to wm events */
+        *sock = openBspwmSocket();
+        subscribeToWMEvents(*sock);
+
+        return !output.empty();
+    }
+
+    std::string formatBspwmWorkspaceStatus(int *sock, std::string newFocus) {
+        std::string formattedWorkspaceStatus;
+
+        for (std::map<int, std::string>::iterator x = workspaceMap.begin();
+                x != workspaceMap.end(); x++) {
+            std::string wsIndxString = std::to_string(x->first+1);
+            if (newFocus != x->second && doesDesktopHaveNodes(sock, x->second))
+                formattedWorkspaceStatus += "%{A:bspc desktop -f " + x->second + ":}  "
+                        + wsIndxString + "  %{A} | ";
+            else if (newFocus == x->second)
+                formattedWorkspaceStatus += "%{+u}  " + wsIndxString + "  %{-u} | ";
+        }
+        formattedWorkspaceStatus.resize(formattedWorkspaceStatus.size() - 3);
+        return formattedWorkspaceStatus;
     }
 
     void startLoop() {
-        std::string wmStatus(1024, 0);
-        int sock = subscribeToEvents();
+        int sock = openBspwmSocket();
+
+        /* Fill initial map */
+        fillWorkspaceMap(sock);
+
+        std::string focusedWorkspace;
 
         while (true) {
-            if (read(sock, &wmStatus[0], 1023) > -1)
-                printBspwmBuffer(wmStatus);
+            if (focusedWorkspace.empty()) {
+                /* For the first loop, get the currently focused desktop */
+                sock = openBspwmSocket();
+                writeToSocket(sock, "query --desktop --desktops");
+                focusedWorkspace = readSocketOutput(sock);
+
+                /* Now subscribe to focus changes */
+                sock = openBspwmSocket();
+                subscribeToWMEvents(sock);
+            } else {
+                /* Filter focus events and update focusedWorkspace */
+                std::istringstream socketOutput(readSocketOutput(sock));
+                std::string buf;
+                while (std::getline(socketOutput, buf, '\n')) {
+                    if (buf.find("desktop_focus") != std::string::npos) {
+                        focusedWorkspace = filterId(buf);
+                        break;
+                    }
+                }
+            }
+
+            printBuffer(formatBspwmWorkspaceStatus(&sock, focusedWorkspace), "bspwm");
         }
     }
 
