@@ -54,6 +54,10 @@ namespace bspwm {
     std::string readSocketOutput(int sock) {
         std::string output(1024, 0);
         int numRead = read(sock, &output[0], 1023);
+
+        if (!numRead)
+            return "";
+
         output.resize(numRead-1);
         return output;
     }
