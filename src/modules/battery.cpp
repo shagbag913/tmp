@@ -5,7 +5,9 @@
 #include <ostream>
 #include <string>
 #include <thread>
+
 #include "main.h"
+
 namespace fs = std::filesystem;
 
 namespace battery {

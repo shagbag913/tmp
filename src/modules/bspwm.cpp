@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <thread>
 #include <unistd.h>
+
 #include "main.h"
 
 namespace bspwm {

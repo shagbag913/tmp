@@ -4,7 +4,9 @@
 #include <thread>
 #include <filesystem>
 #include <fstream>
+
 #include "main.h"
+
 namespace fs = std::filesystem;
 
 namespace backlight {

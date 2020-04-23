@@ -2,11 +2,12 @@
 #include <iostream>
 #include <map>
 #include <thread>
-#include "backlight.h"
-#include "battery.h"
-#include "bspwm.h"
-#include "date.h"
-#include "net.h"
+
+#include "modules/backlight.h"
+#include "modules/battery.h"
+#include "modules/bspwm.h"
+#include "modules/date.h"
+#include "modules/net.h"
 
 std::map<std::string, std::string> moduleMap;
 
