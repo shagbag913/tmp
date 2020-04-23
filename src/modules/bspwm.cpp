@@ -74,12 +74,20 @@ namespace bspwm {
         }
     }
 
-    std::string filterId(std::string strn) {
-        int space = strn.find_last_of(' ');
-        if (space > 0 && space < (int)strn.size()) {
-            strn = strn.substr(space+1, strn.size() - space);
+    std::string filterBetweenNthOccurence(int occurence, std::string strn) {
+        int n = 0, x;
+        for (x = 0; x < (int)strn.size(); x++) {
+            if (strn[x] == ' ') {
+                n++;
+                if (n == occurence)
+                    break;
+            }
         }
-        return strn;
+        return strn.substr(x+1, 10);
+    }
+
+    std::string filterDesktopId(std::string strn) {
+        return filterBetweenNthOccurence(2, strn);
     }
 
     void subscribeToWMEvents(int sock) {
@@ -146,7 +154,7 @@ namespace bspwm {
                 std::string buf;
                 while (std::getline(socketOutput, buf, '\n')) {
                     if (buf.find("desktop_focus") != std::string::npos) {
-                        focusedWorkspace = filterId(buf);
+                        focusedWorkspace = filterDesktopId(buf);
                         break;
                     }
                 }
