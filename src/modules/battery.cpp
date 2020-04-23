@@ -13,10 +13,14 @@ namespace fs = std::filesystem;
 namespace battery {
 
     std::string getBatterySysfsDir() {
-        std::string path = "/sys/class/power_supply/";
-        for (const auto &entry : fs::directory_iterator(path))
-            if (entry.path().string().find("BAT") != std::string::npos)
-                return entry.path();
+        try {
+            std::string path = "/sys/class/power_supply/";
+            for (const auto &entry : fs::directory_iterator(path))
+                if (entry.path().string().find("BAT") != std::string::npos)
+                    return entry.path();
+        } catch (fs::filesystem_error& e) {
+            // Do nothing for now, TODO: add logging, disable module
+        }
         return "";
     }
 
@@ -26,7 +30,7 @@ namespace battery {
 
         capacityFile.open(getBatterySysfsDir() + "/capacity");
         if (!capacityFile.is_open()) {
-            /* Return -1 in case file couldn't be opened */
+            // TODO: logging
             return -1;
         }
         std::getline(capacityFile, capacity);
@@ -40,6 +44,7 @@ namespace battery {
 
         statusFile.open(getBatterySysfsDir() + "/status");
         if (!statusFile.is_open()) {
+            // TODO: logging
             return false;
         }
         std::getline(statusFile, status);
