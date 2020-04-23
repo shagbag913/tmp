@@ -30,7 +30,6 @@ namespace backlight {
 
         brightness.open(backlightSysfsPath + "/brightness");
         getline(brightness, buf);
-        brightness.close();
         int currentBrightness = std::stoi(buf);
 
         float percentage = ((float)currentBrightness / maxBrightness) * 100;
