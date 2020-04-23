@@ -82,27 +82,27 @@ namespace bspwm {
         writeToSocket(sock, "subscribe desktop_focus node_add node_remove node_transfer");
     }
 
-    bool doesDesktopHaveNodes(int *sock, std::string desktopId) {
+    bool doesDesktopHaveNodes(int& sock, std::string desktopId) {
         char *queryMsg = new char[sizeof("query --nodes --desktop ") + desktopId.size() + 1];
         sprintf(queryMsg, "query --nodes --desktop %s", desktopId.c_str());
 
-        close(*sock);
-        *sock = openBspwmSocket();
+        close(sock);
+        sock = openBspwmSocket();
 
-        writeToSocket(*sock, queryMsg);
+        writeToSocket(sock, queryMsg);
 
         delete[] queryMsg;
 
-        std::string output = readSocketOutput(*sock);
+        std::string output = readSocketOutput(sock);
 
         /* Resubscribe to wm events */
-        *sock = openBspwmSocket();
-        subscribeToWMEvents(*sock);
+        sock = openBspwmSocket();
+        subscribeToWMEvents(sock);
 
         return !output.empty();
     }
 
-    std::string formatBspwmWorkspaceStatus(int *sock, std::string newFocus) {
+    std::string formatBspwmWorkspaceStatus(int& sock, std::string newFocus) {
         std::string formattedWorkspaceStatus;
 
         for (std::map<int, std::string>::iterator x = workspaceMap.begin();
@@ -148,7 +148,7 @@ namespace bspwm {
                 }
             }
 
-            printBuffer(formatBspwmWorkspaceStatus(&sock, focusedWorkspace), "bspwm");
+            printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
         }
     }
 
