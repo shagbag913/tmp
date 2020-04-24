@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <thread>
 #include <sys/stat.h>
 #include <vector>
@@ -17,25 +18,25 @@ namespace net {
         std::string netSysfsPath = "/sys/class/net/";
         std::ifstream operstate;
         struct stat buf;
-        for (const auto& dir : fs::directory_iterator(netSysfsPath)) {
-            if (dir.path().string() != "lo") {
-                operstate.open(dir.path().string() + "/operstate");
-                std::getline(operstate, operstateCont);
-                if (operstateCont == "up") {
-                    wirelessPath = dir.path().string() + "/wireless";
-                    if (stat(wirelessPath.c_str(), &buf) == 0)
-                        formattedNetString += "  ";
-                    else
-                        formattedNetString += "  ";
-                }
-                operstate.close();
-            }
-        }
-
         try {
+            for (const auto& dir : fs::directory_iterator(netSysfsPath)) {
+                if (dir.path().string() != "lo") {
+                    operstate.open(dir.path().string() + "/operstate");
+                    std::getline(operstate, operstateCont);
+                    if (operstateCont == "up") {
+                        wirelessPath = dir.path().string() + "/wireless";
+                        if (stat(wirelessPath.c_str(), &buf) == 0)
+                            formattedNetString += "  ";
+                        else
+                            formattedNetString += "  ";
+                    }
+                    operstate.close();
+                }
+            }
             formattedNetString.resize(formattedNetString.size() - 2);
-        } catch (std::length_error& e) {
-            // Do nothing, return empty string
+        } catch (...) {
+            // Couldn't iterate or no networks are connected; return empty string
+            return "";
         }
         return formattedNetString;
     }

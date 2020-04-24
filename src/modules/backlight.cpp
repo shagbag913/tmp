@@ -13,10 +13,15 @@ namespace backlight {
 
     std::string getBacklightPercentageString() {
         std::string backlightSysfsPath = "/sys/class/backlight/";
-        for (const auto& entry : fs::directory_iterator(backlightSysfsPath)) {
-            backlightSysfsPath = entry.path().string();
-            break;
+        try {
+            for (const auto& entry : fs::directory_iterator(backlightSysfsPath)) {
+                backlightSysfsPath = entry.path().string();
+                break;
+            }
+        } catch (fs::filesystem_error& e) {
+            // Handled in next if block
         }
+
         if (backlightSysfsPath == "/sys/class/backlight/")
             return "";
 
