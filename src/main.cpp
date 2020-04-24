@@ -35,7 +35,7 @@ int main() {
     t5.join();
 }
 
-void addToBuffer(std::vector<std::string> modules, std::string& buffer) {
+void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
     std::string seperator = "  |  ";
 
     for (std::string module : modules)
