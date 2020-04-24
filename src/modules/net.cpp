@@ -32,7 +32,11 @@ namespace net {
             }
         }
 
-        formattedNetString.resize(formattedNetString.size() - 2);
+        try {
+            formattedNetString.resize(formattedNetString.size() - 2);
+        } catch (std::length_error& e) {
+            // Do nothing, return empty string
+        }
         return formattedNetString;
     }
 
