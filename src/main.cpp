@@ -78,9 +78,13 @@ void printBuffer(std::string statusString, std::string moduleName) {
     std::vector<std::string> centerModules = getModulesVector("center_modules", "time,date");
     std::vector<std::string> rightModules = getModulesVector("right_modules", "backlight,net,battery");
 
+    /* Configurable padding */
+    int leftPadding = config::getConfigInt("left_padding", 0);
+    int rightPadding = config::getConfigInt("right_padding", 0);
+
     std::string finalPrintBuffer;
     if (leftModules.size()) {
-        finalPrintBuffer += "%{l}";
+        finalPrintBuffer += "%{l}" + std::string(leftPadding, ' ');
         addToBuffer(leftModules, finalPrintBuffer);
     }
 
@@ -92,6 +96,7 @@ void printBuffer(std::string statusString, std::string moduleName) {
     if (rightModules.size()) {
         finalPrintBuffer += "%{r}";
         addToBuffer(rightModules, finalPrintBuffer);
+        finalPrintBuffer += std::string(rightPadding, ' ');
     }
 
     std::cout << finalPrintBuffer << std::endl;

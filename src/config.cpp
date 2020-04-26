@@ -71,4 +71,8 @@ namespace config {
 
         return defaultValue;
     }
+
+    int getConfigInt(std::string prop, int defaultValue) {
+        return std::stoi(getConfigString(prop, std::to_string(defaultValue)));
+    }
 }
