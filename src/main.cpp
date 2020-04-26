@@ -5,6 +5,8 @@
 #include <thread>
 #include <vector>
 
+#include "config.h"
+
 #include "modules/backlight.h"
 #include "modules/battery.h"
 #include "modules/bspwm.h"
@@ -21,18 +23,23 @@ std::vector<std::string> defaultCenterModules{"time", "date"};
 std::vector<std::string> defaultRightModules{"backlight", "net", "battery"};
 
 int main() {
+    /* Fill initial config map */
+    config::fillPropertyMap();
+
     /* Start threads */
     std::thread t1 = bspwm::start();
     std::thread t2 = battery::start();
     std::thread t3 = date::start();
     std::thread t4 = net::start();
     std::thread t5 = backlight::start();
+    std::thread t6 = config::start();
 
     t1.join();
     t2.join();
     t3.join();
     t4.join();
     t5.join();
+    t6.join();
 }
 
 void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
