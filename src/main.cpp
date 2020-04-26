@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <sstream>
 #include <thread>
 #include <vector>
 
@@ -16,11 +17,6 @@
 std::map<std::string, std::string> moduleMap;
 
 std::mutex printMutex;
-
-/* Temp */
-std::vector<std::string> defaultLeftModules{"bspwm"};
-std::vector<std::string> defaultCenterModules{"time", "date"};
-std::vector<std::string> defaultRightModules{"backlight", "net", "battery"};
 
 int main() {
     /* Fill initial config map */
@@ -53,6 +49,21 @@ void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
         buffer.resize(buffer.size() - seperator.size());
 }
 
+std::vector<std::string> getModulesVector(std::string configString, std::string defaultValue) {
+    std::string configModules = config::getConfigString(configString, defaultValue);
+
+    if (configModules.find(",") != std::string::npos) {
+        std::istringstream iter(configModules);
+        std::string buf;
+        std::vector<std::string> modules;
+        while (getline(iter, buf, ',')) {
+            modules.push_back(buf);
+        }
+        return modules;
+    } else
+        return std::vector<std::string>{configModules};
+}
+
 void printBuffer(std::string statusString, std::string moduleName) {
     printMutex.lock();
     if (!moduleMap.count(moduleName))
@@ -63,14 +74,25 @@ void printBuffer(std::string statusString, std::string moduleName) {
         else
             moduleMap.at(moduleName) = statusString;
 
-    std::string finalPrintBuffer = "%{l}";
-    addToBuffer(defaultLeftModules, finalPrintBuffer);
+    std::vector<std::string> leftModules = getModulesVector("left_modules", "bspwm");
+    std::vector<std::string> centerModules = getModulesVector("center_modules", "time,date");
+    std::vector<std::string> rightModules = getModulesVector("right_modules", "backlight,net,battery");
 
-    finalPrintBuffer += "%{c}";
-    addToBuffer(defaultCenterModules, finalPrintBuffer);
+    std::string finalPrintBuffer;
+    if (leftModules.size()) {
+        finalPrintBuffer += "%{l}";
+        addToBuffer(leftModules, finalPrintBuffer);
+    }
 
-    finalPrintBuffer += "%{r}";
-    addToBuffer(defaultRightModules, finalPrintBuffer);
+    if (centerModules.size()) {
+        finalPrintBuffer += "%{c}";
+        addToBuffer(centerModules, finalPrintBuffer);
+    }
+
+    if (rightModules.size()) {
+        finalPrintBuffer += "%{r}";
+        addToBuffer(rightModules, finalPrintBuffer);
+    }
 
     std::cout << finalPrintBuffer << std::endl;
     printMutex.unlock();
