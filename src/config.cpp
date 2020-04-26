@@ -45,7 +45,7 @@ namespace config {
 
         std::string buf;
         while (std::getline(configFile, buf, '\n')) {
-            if (!buf.size())
+            if (!buf.size() || buf[0] == '#')
                 continue;
             std::string prop = formatProperty(buf);
             std::string value = formatValue(buf);
