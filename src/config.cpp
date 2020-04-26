@@ -45,6 +45,8 @@ namespace config {
 
         std::string buf;
         while (std::getline(configFile, buf, '\n')) {
+            if (!buf.size())
+                continue;
             std::string prop = formatProperty(buf);
             std::string value = formatValue(buf);
             propMap.insert(std::pair<std::string, std::string>(prop, value));
