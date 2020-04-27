@@ -50,7 +50,7 @@ void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
 }
 
 std::vector<std::string> getModulesVector(std::string configString, std::string defaultValue) {
-    std::string configModules = config::getConfigString(configString, defaultValue);
+    std::string configModules = config::getConfigValue(configString, defaultValue);
 
     if (configModules.find(",") != std::string::npos) {
         std::istringstream iter(configModules);
@@ -79,8 +79,8 @@ void printBuffer(std::string statusString, std::string moduleName) {
     std::vector<std::string> rightModules = getModulesVector("right_modules", "backlight,net,battery");
 
     /* Configurable padding */
-    int leftPadding = config::getConfigInt("left_padding", 0);
-    int rightPadding = config::getConfigInt("right_padding", 0);
+    int leftPadding = config::getConfigValue("left_padding", 0);
+    int rightPadding = config::getConfigValue("right_padding", 0);
 
     std::string finalPrintBuffer;
     if (leftModules.size()) {

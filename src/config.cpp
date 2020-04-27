@@ -65,14 +65,14 @@ namespace config {
         return t1;
     }
 
-    std::string getConfigString(std::string prop, std::string defaultValue) {
+    std::string getConfigValue(std::string prop, std::string defaultValue) {
         if (propMap.count(prop))
             return propMap.at(prop);
 
         return defaultValue;
     }
 
-    int getConfigInt(std::string prop, int defaultValue) {
-        return std::stoi(getConfigString(prop, std::to_string(defaultValue)));
+    int getConfigValue(std::string prop, int defaultValue) {
+        return std::stoi(getConfigValue(prop, std::to_string(defaultValue)));
     }
 }

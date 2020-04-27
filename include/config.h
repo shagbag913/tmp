@@ -4,6 +4,6 @@
 namespace config {
     void fillPropertyMap();
     std::thread start();
-    std::string getConfigString(std::string prop, std::string defaultValue);
-    int getConfigInt(std::string prop, int defaultValue);
+    std::string getConfigValue(std::string prop, std::string defaultValue);
+    int getConfigValue(std::string prop, int defaultValue);
 }
