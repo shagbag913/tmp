@@ -54,15 +54,8 @@ namespace backlight {
     }
 
     void loop() {
-        std::string oldBrightnessString, newBrightnessString;
-
         while (true) {
-            newBrightnessString = " " + getBacklightPercentageString() + "%";
-            if (newBrightnessString != oldBrightnessString) {
-                oldBrightnessString = newBrightnessString;
-                printBuffer(newBrightnessString, "backlight");
-            }
-
+            printBuffer(" " + getBacklightPercentageString() + "%", "backlight");
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }

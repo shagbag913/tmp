@@ -75,31 +75,20 @@ namespace battery {
     }
 
     void startLoop() {
-        std::string statusString;
-        int previousCapacity = 0, currentCapacity = 0, glyphIndex = -1;
-        bool wasCharging = false, nowCharging = true;
+        int capacity = 0, glyphIndex = -1;
+        bool charging = true;
 
         while (true) {
-            currentCapacity = readCapacityFile();
-            nowCharging = isCharging();
+            capacity = readCapacityFile();
+            charging = isCharging();
 
-            if (previousCapacity != currentCapacity || nowCharging != wasCharging || nowCharging) {
-                previousCapacity = currentCapacity;
-                wasCharging = nowCharging;
+            if (charging && glyphIndex != -1 && glyphIndex < 4)
+                glyphIndex++;
+            else
+                glyphIndex = getCurrentChargeGlyphIndex(capacity);
 
-                if (nowCharging && glyphIndex != -1) {
-                    if (glyphIndex < 4)
-                        glyphIndex++;
-                    else
-                        glyphIndex = getCurrentChargeGlyphIndex(currentCapacity);
-                } else
-                    glyphIndex = getCurrentChargeGlyphIndex(currentCapacity);
-
-
-                statusString = getBatteryGlyph(glyphIndex) + " "
-                        + std::to_string(currentCapacity) + "%" + (nowCharging ? "+" : "");
-                printBuffer(statusString, "battery");
-            }
+            printBuffer(getBatteryGlyph(glyphIndex) + " " + std::to_string(capacity) + "%"
+                    + (charging ? "+" : ""), "battery");
 
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }

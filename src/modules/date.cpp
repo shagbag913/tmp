@@ -38,17 +38,13 @@ namespace date {
     void loop() {
         time_t timeObj;
         tm *localTime;
-        int oldMin = 0, oldDay = 0;
 
         while (true) {
             timeObj = time(NULL);
             localTime = localtime(&timeObj);
 
-            if (oldMin != localTime->tm_min)
-                printBuffer(formatTimeString(localTime), "time");
-
-            if (oldDay != localTime->tm_mday)
-                printBuffer(formatDateString(localTime), "date");
+            printBuffer(formatTimeString(localTime), "time");
+            printBuffer(formatDateString(localTime), "date");
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1000*(60-localTime->tm_sec)));
         }

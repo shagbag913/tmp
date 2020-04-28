@@ -72,7 +72,12 @@ void printBuffer(std::string statusString, std::string moduleName) {
         if (statusString.empty())
             moduleMap.erase(moduleName);
         else
-            moduleMap.at(moduleName) = statusString;
+            if (moduleMap[moduleName] != statusString)
+                moduleMap[moduleName] = statusString;
+            else {
+                printMutex.unlock();
+                return;
+            }
 
     std::vector<std::string> leftModules = getModulesVector("left_modules", "bspwm");
     std::vector<std::string> centerModules = getModulesVector("center_modules", "time,date");

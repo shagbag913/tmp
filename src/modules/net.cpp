@@ -42,14 +42,8 @@ namespace net {
     }
 
     void loop() {
-        std::string netString, newNetString;
-
         while (true) {
-            newNetString = formatNetworkString();
-            if (netString != newNetString) {
-                printBuffer(newNetString, "net");
-                netString = newNetString;
-            }
+            printBuffer(formatNetworkString(), "net");
             std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         }
     }
