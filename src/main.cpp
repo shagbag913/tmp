@@ -46,7 +46,7 @@ void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
             buffer += moduleMap[module] + seperator;
 
     if (buffer.size() > seperator.size())
-        buffer.resize(buffer.size() - seperator.size());
+        buffer.resize(buffer.size() - (seperator.size()-1));
 }
 
 std::vector<std::string> getModulesVector(std::string configString, std::string defaultValue) {
