@@ -54,7 +54,10 @@ namespace bspwm {
     std::string readSocketOutput(int sock) {
         std::string output(1024, 0);
         int numRead = read(sock, &output[0], 1023);
-        output.resize(numRead-1);
+        if (numRead > 1)
+            output.resize(numRead-1);
+        else
+            return "";
         return output;
     }
 
@@ -122,6 +125,8 @@ namespace bspwm {
             else if (newFocus == x->second)
                 formattedWorkspaceStatus += "%{+u}  " + wsIndxString + "  %{-u} | ";
         }
+
+        /* No need for a size check here, aleady checked in the loop. */
         formattedWorkspaceStatus.resize(formattedWorkspaceStatus.size() - 3);
         return formattedWorkspaceStatus;
     }
@@ -156,7 +161,11 @@ namespace bspwm {
                 }
             }
 
-            printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
+            /* If focusedWorkspace is empty, bspwm socket wasn't able to be read.
+             * TODO: handle this better in the future, maybe reconnect to the socket in this case?
+             */
+            if (!focusedWorkspace.empty())
+                printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
         }
     }
 
