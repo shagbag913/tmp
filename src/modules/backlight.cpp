@@ -27,6 +27,8 @@ namespace backlight {
 
         std::ifstream brightness;
         brightness.open(backlightSysfsPath + "/max_brightness");
+        if (!brightness.is_open())
+            return "";
 
         std::string buf;
         getline(brightness, buf);
@@ -34,6 +36,9 @@ namespace backlight {
         int maxBrightness = std::stoi(buf);
 
         brightness.open(backlightSysfsPath + "/brightness");
+        if (!brightness.is_open())
+            return "";
+
         getline(brightness, buf);
         int currentBrightness = std::stoi(buf);
 
