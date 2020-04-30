@@ -7,6 +7,7 @@
 #include <thread>
 
 #include "main.h"
+#include "utils.h"
 
 namespace fs = std::filesystem;
 
@@ -24,32 +25,8 @@ namespace battery {
         return "";
     }
 
-    int readCapacityFile() {
-        std::ifstream capacityFile;
-        std::string capacity;
-
-        capacityFile.open(getBatterySysfsDir() + "/capacity");
-        if (!capacityFile.is_open()) {
-            // TODO: logging
-            return -1;
-        }
-        std::getline(capacityFile, capacity);
-
-        return std::stoi(capacity);
-    }
-
-    bool isCharging() {
-        std::ifstream statusFile;
-        std::string status;
-
-        statusFile.open(getBatterySysfsDir() + "/status");
-        if (!statusFile.is_open()) {
-            // TODO: logging
-            return false;
-        }
-        std::getline(statusFile, status);
-
-        return status == "Charging";
+    bool isCharging(std::string batterySysfsDir) {
+        return utils::readSysfsFileString(batterySysfsDir + "/status") == "Charging";
     }
 
     int getCurrentChargeGlyphIndex(int currentCharge) {
@@ -77,18 +54,21 @@ namespace battery {
     void startLoop() {
         int capacity = 0, glyphIndex = -1;
         bool charging = true;
+        std::string batterySysfsDir = getBatterySysfsDir();
 
-        while (true) {
-            capacity = readCapacityFile();
-            charging = isCharging();
+        while (!batterySysfsDir.empty()) {
+            capacity = utils::readSysfsFileInt(batterySysfsDir + "/capacity");
+            charging = isCharging(batterySysfsDir);
 
-            if (charging && glyphIndex != -1 && glyphIndex < 4)
-                glyphIndex++;
-            else
-                glyphIndex = getCurrentChargeGlyphIndex(capacity);
+            if (capacity != -1) {
+                if (charging && glyphIndex != -1 && glyphIndex < 4)
+                    glyphIndex++;
+                else
+                    glyphIndex = getCurrentChargeGlyphIndex(capacity);
 
-            printBuffer(getBatteryGlyph(glyphIndex) + " " + std::to_string(capacity) + "%"
-                    + (charging ? "+" : ""), "battery");
+                printBuffer(getBatteryGlyph(glyphIndex) + " " + std::to_string(capacity) + "%"
+                        + (charging ? "+" : ""), "battery");
+            }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }

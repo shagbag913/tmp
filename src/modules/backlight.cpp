@@ -6,42 +6,25 @@
 #include <fstream>
 
 #include "main.h"
+#include "utils.h"
 
 namespace fs = std::filesystem;
 
 namespace backlight {
 
-    std::string getBacklightPercentageString() {
+    std::string getBacklightSysfsPath() {
         std::string backlightSysfsPath = "/sys/class/backlight/";
         try {
             for (const auto& entry : fs::directory_iterator(backlightSysfsPath)) {
-                backlightSysfsPath = entry.path().string();
-                break;
+                return entry.path().string();
             }
         } catch (fs::filesystem_error& e) {
-            // Handled in next if block
         }
 
-        if (backlightSysfsPath == "/sys/class/backlight/")
-            return "";
+        return "";
+    }
 
-        std::ifstream brightness;
-        brightness.open(backlightSysfsPath + "/max_brightness");
-        if (!brightness.is_open())
-            return "";
-
-        std::string buf;
-        getline(brightness, buf);
-        brightness.close();
-        int maxBrightness = std::stoi(buf);
-
-        brightness.open(backlightSysfsPath + "/brightness");
-        if (!brightness.is_open())
-            return "";
-
-        getline(brightness, buf);
-        int currentBrightness = std::stoi(buf);
-
+    std::string getBacklightPercentageString(int maxBrightness, int currentBrightness) {
         float percentage = ((float)currentBrightness / maxBrightness) * 100;
         std::string brightnessPercentageString;
 
@@ -59,8 +42,17 @@ namespace backlight {
     }
 
     void loop() {
+        std::string backlightSysfsPath = getBacklightSysfsPath();
+        std::string brightnessString;
+        int maxBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/max_brightness");
+        int currentBrightness;
+
         while (true) {
-            printBuffer(" " + getBacklightPercentageString() + "%", "backlight");
+            currentBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/brightness");
+            if (currentBrightness != -1) {
+                brightnessString = getBacklightPercentageString(maxBrightness, currentBrightness);
+                printBuffer(" " + brightnessString + "%", "backlight");
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
@@ -70,4 +62,3 @@ namespace backlight {
         return t1;
     }
 }
-

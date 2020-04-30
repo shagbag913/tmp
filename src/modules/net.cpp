@@ -22,15 +22,16 @@ namespace net {
             for (const auto& dir : fs::directory_iterator(netSysfsPath)) {
                 if (dir.path().string() != "lo") {
                     operstate.open(dir.path().string() + "/operstate");
-                    std::getline(operstate, operstateCont);
-                    if (operstateCont == "up") {
-                        wirelessPath = dir.path().string() + "/wireless";
-                        if (stat(wirelessPath.c_str(), &buf) == 0)
-                            formattedNetString += "  ";
-                        else
-                            formattedNetString += "  ";
+                    if (std::getline(operstate, operstateCont)) {
+                        if (operstateCont == "up") {
+                            wirelessPath = dir.path().string() + "/wireless";
+                            if (stat(wirelessPath.c_str(), &buf) == 0)
+                                formattedNetString += "  ";
+                            else
+                                formattedNetString += "  ";
+                        }
+                        operstate.close();
                     }
-                    operstate.close();
                 }
             }
             formattedNetString.resize(formattedNetString.size() - 2);
