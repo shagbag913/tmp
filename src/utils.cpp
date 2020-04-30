@@ -23,4 +23,8 @@ namespace utils {
             return buf;
         return "";
     }
+
+    int getPercentage(int x, int y) {
+        return (int)((float)x / y * 100 + 0.5f);
+    }
 }

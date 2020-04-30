@@ -24,23 +24,6 @@ namespace backlight {
         return "";
     }
 
-    std::string getBacklightPercentageString(int maxBrightness, int currentBrightness) {
-        float percentage = ((float)currentBrightness / maxBrightness) * 100;
-        std::string brightnessPercentageString;
-
-        if (percentage == 100)
-            brightnessPercentageString = "100";
-        else {
-            brightnessPercentageString = std::to_string(percentage);
-            if (percentage < 10)
-                brightnessPercentageString.resize(1);
-            else
-                brightnessPercentageString.resize(2);
-        }
-
-        return brightnessPercentageString;
-    }
-
     void loop() {
         std::string backlightSysfsPath = getBacklightSysfsPath();
         std::string brightnessString;
@@ -50,7 +33,7 @@ namespace backlight {
         while (true) {
             currentBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/brightness");
             if (currentBrightness != -1) {
-                brightnessString = getBacklightPercentageString(maxBrightness, currentBrightness);
+                brightnessString = std::to_string(utils::getPercentage(currentBrightness, maxBrightness));
                 printBuffer(" " + brightnessString + "%", "backlight");
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
