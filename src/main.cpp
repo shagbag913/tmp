@@ -39,7 +39,7 @@ int main() {
 }
 
 void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
-    std::string seperator = "  |  ";
+    std::string seperator = "  " + config::getConfigValue("module_seperator", "|") + "  ";
 
     for (std::string module : modules)
         if (!moduleMap[module].empty())
