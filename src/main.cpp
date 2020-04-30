@@ -12,6 +12,7 @@
 #include "modules/battery.h"
 #include "modules/bspwm.h"
 #include "modules/date.h"
+#include "modules/memory.h"
 #include "modules/net.h"
 
 std::map<std::string, std::string> moduleMap;
@@ -29,6 +30,7 @@ int main() {
     std::thread t4 = net::start();
     std::thread t5 = backlight::start();
     std::thread t6 = config::start();
+    std::thread t7 = memory::start();
 
     t1.join();
     t2.join();
@@ -36,6 +38,7 @@ int main() {
     t4.join();
     t5.join();
     t6.join();
+    t7.join();
 }
 
 void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
@@ -81,7 +84,7 @@ void printBuffer(std::string statusString, std::string moduleName) {
 
     std::vector<std::string> leftModules = getModulesVector("left_modules", "bspwm");
     std::vector<std::string> centerModules = getModulesVector("center_modules", "time,date");
-    std::vector<std::string> rightModules = getModulesVector("right_modules", "backlight,net,battery");
+    std::vector<std::string> rightModules = getModulesVector("right_modules", "memory,backlight,net,battery");
 
     /* Configurable padding */
     int leftPadding = config::getConfigValue("left_padding", 0);
