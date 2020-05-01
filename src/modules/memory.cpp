@@ -23,7 +23,12 @@ namespace memory {
             }
         }
 
-        return std::stoi(value);
+        try {
+            return std::stoi(value);
+        } catch (std::invalid_argument& e) {
+            // TODO: Logging
+            return -1;
+        }
     }
 
     int getUsedMemory(int total, int available) {
@@ -35,8 +40,9 @@ namespace memory {
 
         while (true) {
             availableMemory = getMeminfo("MemAvailable");
-            printBuffer(" " + std::to_string(getUsedMemory(totalMemory, availableMemory)) + "%",
-                    "memory");
+            if (availableMemory != -1)
+                printBuffer(" " + std::to_string(getUsedMemory(totalMemory, availableMemory))
+                        + "%", "memory");
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
     }
