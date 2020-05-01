@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <thread>
 #include <sys/stat.h>
 #include <vector>
