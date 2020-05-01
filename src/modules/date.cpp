@@ -49,9 +49,4 @@ namespace date {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000*(60-localTime->tm_sec)));
         }
     }
-
-    std::thread start() {
-        std::thread t1(loop);
-        return t1;
-    }
 }

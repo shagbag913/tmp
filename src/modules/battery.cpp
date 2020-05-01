@@ -51,7 +51,7 @@ namespace battery {
         return glyphs[index];
     }
 
-    void startLoop() {
+    void loop() {
         int capacity = 0, glyphIndex = -1;
         bool charging = true;
         std::string batterySysfsDir = getBatterySysfsDir();
@@ -72,10 +72,5 @@ namespace battery {
 
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
-    }
-
-    std::thread start() {
-        std::thread t(startLoop);
-        return t;
     }
 }

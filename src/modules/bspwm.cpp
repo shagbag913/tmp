@@ -131,7 +131,7 @@ namespace bspwm {
         return formattedWorkspaceStatus;
     }
 
-    void startLoop() {
+    void loop() {
         int sock = openBspwmSocket();
 
         /* Fill initial map */
@@ -167,10 +167,5 @@ namespace bspwm {
             if (!focusedWorkspace.empty())
                 printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
         }
-    }
-
-    std::thread start() {
-        std::thread t1(startLoop);
-        return t1;
     }
 }

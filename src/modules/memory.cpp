@@ -46,9 +46,4 @@ namespace memory {
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
     }
-
-    std::thread start() {
-        std::thread t1(loop);
-        return t1;
-    }
 }

@@ -53,16 +53,11 @@ namespace config {
         }
     }
 
-    void startLoop() {
+    void loop() {
         while (true) {
             fillPropertyMap();
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
-    }
-
-    std::thread start() {
-        std::thread t1(startLoop);
-        return t1;
     }
 
     std::string getConfigValue(std::string prop, std::string defaultValue) {

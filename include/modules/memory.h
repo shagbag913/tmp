@@ -1,5 +1,3 @@
-#include <thread>
-
 namespace memory {
-    std::thread start();
+    void loop();
 }

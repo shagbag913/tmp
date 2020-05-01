@@ -1,6 +1,3 @@
-#include <iostream>
-#include <thread>
-
 namespace net {
-    std::thread start();
+    void loop();
 }
