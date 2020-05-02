@@ -7,6 +7,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <thread>
+#include <vector>
 
 namespace config {
 
@@ -69,5 +70,14 @@ namespace config {
 
     int getConfigValue(std::string prop, int defaultValue) {
         return std::stoi(getConfigValue(prop, std::to_string(defaultValue)));
+    }
+
+    std::vector<std::string> getMatchingConfigValues(std::string prop) {
+        std::vector<std::string> matchingConfigs;
+        for (std::map<std::string, std::string>::iterator x = propMap.begin(); x != propMap.end();
+                ++x)
+            if (x->first.find(prop) != std::string::npos)
+                matchingConfigs.push_back(x->first);
+        return matchingConfigs;
     }
 }

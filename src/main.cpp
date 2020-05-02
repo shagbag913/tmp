@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "config.h"
+#include "custom_module.h"
 #include "module_base.h"
 
 #include "modules/backlight.h"
@@ -37,6 +38,9 @@ int main() {
     net.startLoop();
     backlight.startLoop();
     memory.startLoop();
+
+    /* Start custom module threads */
+    std::vector<std::thread> customModuleThreads = initializeCustomModuleThreads();
 
     /* Start config checker loop thread */
     std::thread configThread = std::thread(config::loop);
