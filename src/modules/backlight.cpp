@@ -26,14 +26,12 @@ namespace backlight {
 
     void loop() {
         std::string backlightSysfsPath = getBacklightSysfsPath();
-        std::string brightnessString;
         int maxBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/max_brightness");
-        int currentBrightness;
 
         while (true) {
-            currentBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/brightness");
+            int currentBrightness = utils::readSysfsFileInt(backlightSysfsPath + "/brightness");
             if (currentBrightness != -1) {
-                brightnessString = std::to_string(utils::getPercentage(currentBrightness, maxBrightness));
+                std::string brightnessString = std::to_string(utils::getPercentage(currentBrightness, maxBrightness));
                 printBuffer(" " + brightnessString + "%", "backlight");
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(300));

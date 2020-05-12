@@ -61,18 +61,18 @@ namespace config {
         }
     }
 
-    std::string getConfigValue(std::string prop, std::string defaultValue) {
+    std::string getConfigValue(const std::string& prop, const std::string& defaultValue) {
         if (propMap.count(prop))
             return propMap.at(prop);
 
         return defaultValue;
     }
 
-    int getConfigValue(std::string prop, int defaultValue) {
+    int getConfigValue(const std::string& prop, int defaultValue) {
         return std::stoi(getConfigValue(prop, std::to_string(defaultValue)));
     }
 
-    std::vector<std::string> getMatchingConfigValues(std::string prop) {
+    std::vector<std::string> getMatchingConfigValues(const std::string& prop) {
         std::vector<std::string> matchingConfigs;
         for (std::map<std::string, std::string>::iterator x = propMap.begin(); x != propMap.end();
                 ++x)

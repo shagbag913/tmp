@@ -9,7 +9,7 @@
 
 namespace memory {
 
-    int getMeminfo(std::string infoName) {
+    int getMeminfo(const std::string& infoName) {
         std::ifstream meminfo("/proc/meminfo");
         std::string buf, currentInfoName, value;
 
@@ -36,10 +36,10 @@ namespace memory {
     }
 
     void loop() {
-        int totalMemory = getMeminfo("MemTotal"), availableMemory;
+        int totalMemory = getMeminfo("MemTotal");
 
         while (true) {
-            availableMemory = getMeminfo("MemAvailable");
+            int availableMemory = getMeminfo("MemAvailable");
             if (availableMemory != -1)
                 printBuffer(" " + std::to_string(getUsedMemory(totalMemory, availableMemory))
                         + "%", "memory");

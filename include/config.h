@@ -4,7 +4,7 @@
 namespace config {
     void fillPropertyMap();
     void loop();
-    std::string getConfigValue(std::string prop, std::string defaultValue);
-    int getConfigValue(std::string prop, int defaultValue);
-    std::vector<std::string> getMatchingConfigValues(std::string);
+    std::string getConfigValue(const std::string&, const std::string&);
+    int getConfigValue(const std::string&, int);
+    std::vector<std::string> getMatchingConfigValues(const std::string&);
 }

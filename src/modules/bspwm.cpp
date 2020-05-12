@@ -85,7 +85,7 @@ namespace bspwm {
         return strn.substr(x+1, 10);
     }
 
-    std::string filterDesktopId(std::string strn) {
+    std::string filterDesktopId(const std::string& strn) {
         return filterBetweenNthOccurence(2, strn);
     }
 
@@ -113,11 +113,11 @@ namespace bspwm {
         return !output.empty();
     }
 
-    std::string formatBspwmWorkspaceStatus(int& sock, std::string newFocus) {
+    std::string formatBspwmWorkspaceStatus(int& sock, const std::string& newFocus) {
         std::string formattedWorkspaceStatus;
 
         for (std::map<int, std::string>::iterator x = workspaceMap.begin();
-                x != workspaceMap.end(); x++) {
+                x != workspaceMap.end(); ++x) {
             std::string wsIndxString = std::to_string(x->first+1);
             if (newFocus != x->second && doesDesktopHaveNodes(sock, x->second))
                 formattedWorkspaceStatus += "%{A:bspc desktop -f " + x->second + ":}  "

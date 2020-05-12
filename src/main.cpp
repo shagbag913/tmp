@@ -47,7 +47,7 @@ int main() {
     configThread.join();
 }
 
-void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
+void addToBuffer(const std::vector<std::string>& modules, std::string& buffer) {
     std::string seperator = "  " + config::getConfigValue("module_seperator", "|") + "  ";
 
     for (std::string module : modules)
@@ -58,7 +58,8 @@ void addToBuffer(std::vector<std::string>& modules, std::string& buffer) {
         buffer.resize(buffer.size() - (seperator.size()-1));
 }
 
-std::vector<std::string> getModulesVector(std::string configString, std::string defaultValue) {
+std::vector<std::string> getModulesVector(const std::string& configString,
+        const std::string& defaultValue) {
     std::string configModules = config::getConfigValue(configString, defaultValue);
 
     if (configModules.find(",") != std::string::npos) {
@@ -73,7 +74,7 @@ std::vector<std::string> getModulesVector(std::string configString, std::string 
         return std::vector<std::string>{configModules};
 }
 
-void printBuffer(std::string statusString, std::string moduleName) {
+void printBuffer(const std::string& statusString, const std::string& moduleName) {
     printMutex.lock();
     if (!moduleMap.count(moduleName))
         moduleMap.insert(std::pair<std::string, std::string>(moduleName, statusString));

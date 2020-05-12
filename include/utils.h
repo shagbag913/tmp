@@ -1,8 +1,8 @@
 #include <iostream>
 
 namespace utils {
-    int readSysfsFileInt(std::string fileName);
-    std::string readSysfsFileString(std::string filename);
-    int getPercentage(int x, int y);
+    int readSysfsFileInt(const std::string&);
+    std::string readSysfsFileString(const std::string&);
+    int getPercentage(int, int);
 }
 

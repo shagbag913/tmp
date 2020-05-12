@@ -5,7 +5,7 @@
 
 namespace utils {
 
-    int readSysfsFileInt(std::string filename) {
+    int readSysfsFileInt(const std::string& filename) {
         std::ifstream file(filename);
         std::string buf;
         if (getline(file, buf))
@@ -16,7 +16,7 @@ namespace utils {
         return -1;
     }
 
-    std::string readSysfsFileString(std::string filename) {
+    std::string readSysfsFileString(const std::string& filename) {
         std::ifstream file(filename);
         std::string buf;
         if (getline(file, buf))

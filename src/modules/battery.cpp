@@ -25,7 +25,7 @@ namespace battery {
         return "";
     }
 
-    bool isCharging(std::string batterySysfsDir) {
+    bool isCharging(const std::string& batterySysfsDir) {
         return utils::readSysfsFileString(batterySysfsDir + "/status") == "Charging";
     }
 
@@ -52,13 +52,12 @@ namespace battery {
     }
 
     void loop() {
-        int capacity = 0, glyphIndex = -1;
-        bool charging = true;
+        int glyphIndex = -1;
         std::string batterySysfsDir = getBatterySysfsDir();
 
         while (!batterySysfsDir.empty()) {
-            capacity = utils::readSysfsFileInt(batterySysfsDir + "/capacity");
-            charging = isCharging(batterySysfsDir);
+            int capacity = utils::readSysfsFileInt(batterySysfsDir + "/capacity");
+            bool charging = isCharging(batterySysfsDir);
 
             if (capacity != -1) {
                 if (charging && glyphIndex != -1 && glyphIndex < 4)

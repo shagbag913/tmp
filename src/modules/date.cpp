@@ -36,12 +36,9 @@ namespace date {
     }
 
     void loop() {
-        time_t timeObj;
-        tm *localTime;
-
         while (true) {
-            timeObj = time(NULL);
-            localTime = localtime(&timeObj);
+            time_t timeObj = time(NULL);
+            tm *localTime = localtime(&timeObj);
 
             printBuffer(formatTimeString(localTime), "time");
             printBuffer(formatDateString(localTime), "date");
