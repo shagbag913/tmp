@@ -141,6 +141,7 @@ namespace bspwm {
 
         while (true) {
             if (focusedWorkspace.empty()) {
+                close(sock);
                 /* For the first loop, get the currently focused desktop */
                 sock = openBspwmSocket();
                 writeToSocket(sock, "query --desktop --desktops");
@@ -152,6 +153,10 @@ namespace bspwm {
             } else {
                 /* Filter focus events and update focusedWorkspace */
                 std::istringstream socketOutput(readSocketOutput(sock));
+                if (socketOutput.rdbuf()->in_avail() == 0) {
+                    focusedWorkspace = "";
+                    continue;
+                }
                 std::string buf;
                 while (std::getline(socketOutput, buf, '\n')) {
                     if (buf.find("desktop_focus") != std::string::npos) {
@@ -161,11 +166,7 @@ namespace bspwm {
                 }
             }
 
-            /* If focusedWorkspace is empty, bspwm socket wasn't able to be read.
-             * TODO: handle this better in the future, maybe reconnect to the socket in this case?
-             */
-            if (!focusedWorkspace.empty())
-                printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
+            printBuffer(formatBspwmWorkspaceStatus(sock, focusedWorkspace), "bspwm");
         }
     }
 }
